@@ -371,16 +371,9 @@ endfunction
 
 function! emmet#getFileType(...) abort
   let flg = get(a:000, 0, 0)
-  
-  if has_key(s:emmet_settings, &filetype)
-    let type = &filetype
-    if emmet#getResource(type, 'ignore_embeded_filetype', 0)
-      return type 
-    endif
-  endif 
 
-  let pos = emmet#util#getcurpos()
-  let type = synIDattr(synID(max([pos[1], 1]), max([pos[2], 1]), 1), 'name')
+  let types = luaeval('require("emmet-vim.filetype_functions").from_pos_or_filetype()')
+  let type = types[0]
 
   " ignore htmlTagName as it seems to occur too often
   if type == 'htmlTagName'
@@ -391,17 +384,17 @@ function! emmet#getFileType(...) abort
   endif
 
   if type =~? '^css'
-    let type = 'css'
+    let type = 'styled'
   elseif type =~? '^html'
     let type = 'html'
   elseif type =~? '^jsx'
     let type = 'jsx'
   elseif (type =~? '^js\w' || type =~? '^javascript') && !(&filetype =~? 'jsx')
-    let type = 'javascript'
+    let type = 'jsx'
   elseif type =~? '^tsx'
     let type = 'tsx'
   elseif type =~? '^ts\w' || type =~? '^typescript'
-    let type = 'typescript'
+    let type = 'tsx'
   elseif type =~? '^xml'
     let type = 'xml'
   elseif type == 'styledEmmetAbbreviation'
